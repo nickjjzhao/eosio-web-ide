@@ -11,6 +11,8 @@ struct [[eosio::table("message"), eosio::contract("talk")]] message {
     uint64_t get_reply_to() const { return reply_to; }
 };
 
+// to do...
+
 using message_table = eosio::multi_index<
     "message"_n, message, eosio::indexed_by<"by.reply.to"_n, eosio::const_mem_fun<message, uint64_t, &message::get_reply_to>>>;
 
