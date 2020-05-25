@@ -12,6 +12,7 @@ using namespace fc;
 BOOST_AUTO_TEST_SUITE(talk_tests)
 
 BOOST_AUTO_TEST_CASE(post) try {
+
     tester t{setup_policy::none};
 
     // Load contract
@@ -63,6 +64,49 @@ BOOST_AUTO_TEST_CASE(post) try {
             );
         }(),
         fc::exception);
+
+    // test like action
+    t.push_action(
+        N(talk), N(like), N(john),
+        mutable_variant_object //
+        ("id", 1)              //
+        ("post_id", 2)        //
+        ("user", "john")       //
+    );
+
+    t.push_action(
+        N(talk), N(like), N(jane),
+        mutable_variant_object //
+        ("id", 2)              //
+        ("post_id", 1)        //
+        ("user", "jane")       //
+    );
+
+    // Can't like their own post
+    BOOST_CHECK_THROW(
+        [&] {
+            t.push_action(
+                N(talk), N(like), N(john),
+                mutable_variant_object       //
+                ("id", 3)                    //
+                ("post_id", 1)               //
+                ("user", "john")            //
+            );
+        }(),
+        fc::exception);
+
+    //invalid likes number
+    BOOST_CHECK_THROW(
+        [&] {
+            t.push_action(
+                N(talk), N(numlikes), N(john),
+                mutable_variant_object       //
+                ("user", "john")             //
+                ("num", 3)                   //
+            );
+        }(),
+        fc::exception);
+
 }
 FC_LOG_AND_RETHROW()
 
